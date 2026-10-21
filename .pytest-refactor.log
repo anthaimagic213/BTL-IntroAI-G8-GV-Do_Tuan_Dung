@@ -1,0 +1,84 @@
+FFFF.................................................................... [ 44%]
+........................................................................ [ 88%]
+..................                                                       [100%]
+================================== FAILURES ===================================
+__________________ test_sample_solution_and_history[config0] __________________
+
+config = {'inference': 'none', 'use_mrv': False, 'use_lcv': False, 'backtrack_strategy': 'standard'}
+
+    @pytest.mark.parametrize("config", CONFIGS)
+    def test_sample_solution_and_history(config):
+        source = deepcopy(SAMPLE)
+        solver = make_solver(source, config)
+        result = solver.solve()
+        SolveResponse.model_validate(result)
+>       assert result["status"] == "success"
+E       AssertionError: assert 'limit_reached' == 'success'
+E         
+E         - success
+E         + limit_reached
+
+tests\test_solver.py:46: AssertionError
+__________________ test_sample_solution_and_history[config1] __________________
+
+config = {'inference': 'none', 'use_mrv': False, 'use_lcv': False, 'backtrack_strategy': 'cbj'}
+
+    @pytest.mark.parametrize("config", CONFIGS)
+    def test_sample_solution_and_history(config):
+        source = deepcopy(SAMPLE)
+        solver = make_solver(source, config)
+        result = solver.solve()
+        SolveResponse.model_validate(result)
+>       assert result["status"] == "success"
+E       AssertionError: assert 'limit_reached' == 'success'
+E         
+E         - success
+E         + limit_reached
+
+tests\test_solver.py:46: AssertionError
+__________________ test_sample_solution_and_history[config2] __________________
+
+config = {'inference': 'none', 'use_mrv': False, 'use_lcv': True, 'backtrack_strategy': 'standard'}
+
+    @pytest.mark.parametrize("config", CONFIGS)
+    def test_sample_solution_and_history(config):
+        source = deepcopy(SAMPLE)
+        solver = make_solver(source, config)
+        result = solver.solve()
+        SolveResponse.model_validate(result)
+>       assert result["status"] == "success"
+E       AssertionError: assert 'limit_reached' == 'success'
+E         
+E         - success
+E         + limit_reached
+
+tests\test_solver.py:46: AssertionError
+__________________ test_sample_solution_and_history[config3] __________________
+
+config = {'inference': 'none', 'use_mrv': False, 'use_lcv': True, 'backtrack_strategy': 'cbj'}
+
+    @pytest.mark.parametrize("config", CONFIGS)
+    def test_sample_solution_and_history(config):
+        source = deepcopy(SAMPLE)
+        solver = make_solver(source, config)
+        result = solver.solve()
+        SolveResponse.model_validate(result)
+>       assert result["status"] == "success"
+E       AssertionError: assert 'limit_reached' == 'success'
+E         
+E         - success
+E         + limit_reached
+
+tests\test_solver.py:46: AssertionError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Sudoku_Project_IntroAI\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_solver.py::test_sample_solution_and_history[config0] - Asse...
+FAILED tests/test_solver.py::test_sample_solution_and_history[config1] - Asse...
+FAILED tests/test_solver.py::test_sample_solution_and_history[config2] - Asse...
+FAILED tests/test_solver.py::test_sample_solution_and_history[config3] - Asse...
+4 failed, 158 passed, 1 warning in 144.58s (0:02:24)

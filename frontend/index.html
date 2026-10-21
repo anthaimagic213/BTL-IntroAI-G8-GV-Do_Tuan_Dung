@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sudoku | CSP Algorithm Visualizer</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="page-header">
+    <div><span class="eyebrow">NHẬP MÔN TRÍ TUỆ NHÂN TẠO / CONSTRAINT SATISFACTION</span>
+      <h1>Sudoku <span>CSP Visualizer</span></h1>
+      <p>Quan sát cách thuật toán lựa chọn, lan truyền ràng buộc và quay lui.</p>
+    </div>
+    <span class="architecture-badge">Record <span aria-hidden="true">→</span> Replay</span>
+  </header>
+  <main class="workspace">
+    <aside class="panel controls" aria-label="Bảng điều khiển">
+      <h2><span class="section-number">01</span> Bảng điều khiển</h2>
+      <fieldset id="base-options" class="module-group">
+        <legend>1. Thuật toán lõi</legend>
+        <label><input type="radio" name="base_algorithm" value="backtracking" checked> Backtracking Search (DFS)</label>
+        <label><input type="radio" name="base_algorithm" value="local_search"> Local Search (Min-Conflicts)</label>
+      </fieldset>
+      <fieldset id="inference-options" class="module-group dfs-options">
+        <legend>2. Inference · Lan truyền ràng buộc</legend>
+        <label><input type="radio" name="inference" value="none" checked> Không dùng (Naive)</label>
+        <label><input type="radio" name="inference" value="fc"> Forward Checking (FC)</label>
+        <label><input type="radio" name="inference" value="ac3"> Arc Consistency (AC-3 / MAC)</label>
+      </fieldset>
+      <fieldset id="heuristic-options" class="module-group dfs-options">
+        <legend>3. Heuristics · Chọn lọc</legend>
+        <label><input id="use-mrv" type="checkbox"> MRV · Ưu tiên ô ít giá trị nhất</label>
+        <label><input id="use-lcv" type="checkbox"> LCV · Ưu tiên số ít hạn chế nhất</label>
+      </fieldset>
+      <fieldset id="strategy-options" class="module-group dfs-options">
+        <legend>4. Backtrack Strategy</legend>
+        <label><input type="radio" name="backtrack_strategy" value="standard" checked> Standard · Lùi một bước</label>
+        <label><input type="radio" name="backtrack_strategy" value="cbj"> Conflict-Directed Backjumping (CBJ)</label>
+      </fieldset>
+      <p id="algorithm-description" class="help"></p>
+      <p id="local-warning" class="warning" hidden>Min-Conflicts điền kín bảng ngẫu nhiên và sửa lỗi cục bộ, không dùng tìm kiếm cây DFS.</p>
+      <div class="speed-heading"><label for="speed">Tốc độ</label><output id="speed-label" for="speed">50 ms / step</output></div>
+      <input id="speed" type="range" min="1" max="1000" value="50">
+      <div class="range-labels"><span>Nhanh · 1 ms</span><span>Chậm · 1.000 ms</span></div>
+      <section class="metrics" aria-label="Số liệu backend tại bước đang phát">
+        <h3>Đo lường thuật toán</h3>
+        <div><span>Thời gian backend</span><strong id="time">0 ms</strong></div>
+        <div><span>Phép gán</span><strong id="assignments">0</strong></div>
+        <div><span>Lần quay lui</span><strong id="backtracks">0</strong></div>
+        <div><span>Peak Memory</span><strong id="memory">0 KB</strong></div>
+        <div><span>Prunes · Giá trị bị cắt</span><strong id="prunes">0</strong></div>
+        <p>Giá trị tích lũy tại bước đang phát; bộ nhớ gồm history, không phải thời gian chờ animation. Peak Memory đo cấp phát Python toàn tiến trình trong lúc giải.</p>
+      </section>
+      <div class="actions">
+        <button id="play" class="primary">▶ Giải Sudoku</button>
+        <button id="pause" class="secondary" hidden>Ⅱ Tạm dừng</button>
+        <button id="sample" class="secondary">Tạo đề mẫu</button>
+        <button id="clear" class="danger">Xóa bảng</button>
+      </div>
+      <p class="help">Nhập 1–9; Backspace/Delete để xóa. Dùng phím mũi tên để di chuyển. Ô đề bài được khóa khi phát lại.</p>
+    </aside>
+
+    <section class="panel board-panel" aria-label="Bàn cờ Sudoku">
+      <div class="board-heading"><h2><span class="section-number">02</span> Trực quan hóa</h2><span class="size-badge">9 × 9</span></div>
+      <p id="status" class="status" role="status" aria-live="polite">Sẵn sàng. Nhập đề hoặc chọn “Tạo đề mẫu”.</p>
+      <div id="board" class="sudoku-board" role="group" aria-label="Lưới Sudoku 9 hàng, 9 cột"></div>
+      <div class="replay-progress"><span id="step-label">Bước 0 / 0</span><span id="phase-label">CHỜ DỮ LIỆU</span></div>
+      <progress id="progress" value="0" max="1" aria-label="Tiến độ phát lại"></progress>
+      <div class="legend" aria-label="Chú giải màu sắc">
+        <span><i class="initial-key"></i>Đề bài</span>
+        <span><i class="assign-key"></i>Gán</span>
+        <span><i class="prune-key"></i>Cắt miền</span>
+        <span><i class="backtrack-key"></i>Quay lui</span>
+      </div>
+      <p class="board-note">Backend giải một lần. Trình duyệt chỉ phát lại các snapshot đã ghi.</p>
+    </section>
+
+    <section class="panel console-panel" aria-label="Nhật ký thuật toán">
+      <div class="console-heading"><h2><span class="section-number">03</span> Nhật ký thực thi</h2><span class="console-dot" aria-hidden="true"></span></div>
+      <div class="console-toolbar"><span>csp / solver.log</span><span id="log-count">0 sự kiện</span></div>
+      <div id="console" class="console" role="log" aria-live="off" tabindex="0"></div>
+      <p class="console-footer">Tọa độ log: hàng, cột từ 1 đến 9 · JSON: từ 0 đến 8</p>
+    </section>
+  </main>
+  <footer class="page-footer">CSP = Biến + Miền giá trị + Ràng buộc <span>Backtracking · Heuristics · Constraint Propagation · Local Search</span></footer>
+</body>
+</html>
